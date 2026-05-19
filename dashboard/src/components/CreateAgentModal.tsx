@@ -8,13 +8,21 @@ const TEMPLATE_OPTIONS: {
   label: string;
   desc: string;
 }[] = [
-  { value: "general", label: "General", desc: "All-purpose assistant" },
   {
-    value: "code-reviewer",
-    label: "Code reviewer",
-    desc: "Summary, issues, suggestions",
+    value: "mission-analyzer",
+    label: "Mission Analyzer",
+    desc: "Extract stack, budget, and red flags",
   },
-  { value: "doc-writer", label: "Doc writer", desc: "JSDoc-style docs" },
+  {
+    value: "response-drafter",
+    label: "Response Drafter",
+    desc: "Draft a tailored French response",
+  },
+  {
+    value: "effort-estimator",
+    label: "Effort Estimator",
+    desc: "Break down into milestones and price",
+  },
 ];
 
 interface Props {
@@ -23,7 +31,8 @@ interface Props {
 
 export function CreateAgentModal({ onClose }: Props) {
   const [name, setName] = useState("");
-  const [template, setTemplate] = useState<AgentTemplate>("general");
+  const [template, setTemplate] =
+    useState<AgentTemplate>("mission-analyzer");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -81,7 +90,7 @@ export function CreateAgentModal({ onClose }: Props) {
         <div
           role="radiogroup"
           aria-label="Agent template"
-          style={{ display: "flex", flexDirection: "column", gap: 6 }}
+          style={{ display: "flex", flexDirection: "row", gap: 6 }}
         >
           {TEMPLATE_OPTIONS.map((opt) => {
             const selected = template === opt.value;
@@ -93,6 +102,7 @@ export function CreateAgentModal({ onClose }: Props) {
                 aria-checked={selected}
                 onClick={() => setTemplate(opt.value)}
                 style={{
+                  flex: 1,
                   textAlign: "left",
                   background: selected ? "var(--surface)" : "var(--bg)",
                   border: `1px solid ${

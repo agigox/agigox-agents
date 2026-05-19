@@ -1,12 +1,12 @@
 # Agent Dashboard
 
-Multi-agent orchestrator for Claude. Spawn parallel agents with role-specific templates, monitor their execution in real time, and track per-agent token usage and cost.
+**Multi-agent orchestrator for Claude, demonstrated on freelance mission triage.**
 
-Running an LLM agent is easy. Running several at once, each with a distinct role, and seeing what they cost while they stream, is the part that looks like production. This project does that: a single backend orchestrates many Claude agents over one server, streams every token to a live dashboard over WebSocket, and records token usage and dollar cost per agent so spend is never a surprise. Agents can be driven from the web UI or a Telegram bot.
+Paste an incoming mission offer once, watch three specialized Claude agents analyze, draft, and price it in parallel. Same orchestration pattern works for code review, architecture decisions, content workflows, or any task that benefits from parallel specialized reasoning.
 
 - Parallel agents: many agents run concurrently, each an independent Claude conversation
 - Real-time streaming: output appears token by token over a single WebSocket
-- Role templates: general, code reviewer, and doc writer system prompts
+- Role templates: mission analyzer, response drafter, and effort estimator system prompts
 - Cost tracking: input/output tokens and USD cost per agent, aggregated globally
 
 [Live demo](#) · [Loom walkthrough](#)

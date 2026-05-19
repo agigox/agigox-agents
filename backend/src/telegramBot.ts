@@ -7,7 +7,11 @@ import {
 } from "./agentManager";
 import { AgentTemplate } from "./types";
 
-const TEMPLATES: AgentTemplate[] = ["general", "code-reviewer", "doc-writer"];
+const TEMPLATES: AgentTemplate[] = [
+  "mission-analyzer",
+  "response-drafter",
+  "effort-estimator",
+];
 
 function isTemplate(value: string): value is AgentTemplate {
   return (TEMPLATES as string[]).includes(value);
@@ -16,7 +20,7 @@ function isTemplate(value: string): value is AgentTemplate {
 export function initTelegramBot(): void {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
-    console.warn("TELEGRAM_BOT_TOKEN not set — bot disabled");
+    console.warn("TELEGRAM_BOT_TOKEN not set, bot disabled");
     return;
   }
 
@@ -24,14 +28,16 @@ export function initTelegramBot(): void {
 
   bot.command("start", (ctx) =>
     ctx.reply(
-      "Agent Dashboard\n\n/create <name> [template]\n/mission <id> <task>\n/list\n/delete <id>\n\ntemplates: general, code-reviewer, doc-writer",
+      "Agent Dashboard\n\n/create <name> [template]\n/mission <id> <task>\n/list\n/delete <id>\n\ntemplates: mission-analyzer, response-drafter, effort-estimator",
     ),
   );
   bot.command("create", async (ctx) => {
     const tokens = ctx.match.trim().split(/\s+/).filter(Boolean);
     if (!tokens.length) return ctx.reply("Usage: /create <name> [template]");
     const last = tokens[tokens.length - 1];
-    const template: AgentTemplate = isTemplate(last) ? last : "general";
+    const template: AgentTemplate = isTemplate(last)
+      ? last
+      : "mission-analyzer";
     const name = isTemplate(last)
       ? tokens.slice(0, -1).join(" ")
       : tokens.join(" ");

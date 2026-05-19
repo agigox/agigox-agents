@@ -7,7 +7,47 @@ import { CreateAgentModal } from "./components/CreateAgentModal";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
-const DEMO_NAMES = ["Reviewer", "Doc Bot", "Helper"];
+const DEMO_NAMES = [
+  "Mission Analyzer",
+  "Response Drafter",
+  "Effort Estimator",
+];
+
+const DEMO_MALT_OFFER = `Mission Freelance React/Next.js, Refonte plateforme SaaS B2B
+
+Bonjour,
+
+Nous sommes une scale-up parisienne de 25 personnes (FinTech B2B) et recherchons un développeur React expérimenté pour la refonte complète de notre dashboard client.
+
+Contexte:
+- Plateforme actuelle en AngularJS legacy (4 ans), problèmes de performance et UX critiques
+- Stack cible: Next.js 14 (App Router), TypeScript, Tailwind, shadcn/ui, TanStack Query
+- Backend Node.js existant en GraphQL, pas de modification nécessaire
+- Design system en cours de finalisation par notre designer (Figma)
+
+Mission:
+- Refonte du dashboard principal (12 écrans environ)
+- Intégration design system depuis Figma
+- Mise en place tests Playwright sur les parcours critiques
+- Documentation des composants (Storybook souhaité)
+
+Conditions:
+- Démarrage souhaité: ASAP (idéalement semaine prochaine)
+- Durée estimée: 2-3 mois, possibilité d'extension
+- Mode: full remote, sync hebdo en visio
+- Budget: 380€ HT/jour (négociable selon profil)
+- Process: 1 call de matching puis test technique de 2h
+
+Profil recherché:
+- 5+ ans React, dont 2+ ans Next.js App Router
+- Maîtrise Figma to Code, pixel-perfect
+- Expérience plateforme SaaS B2B appréciée
+- Anglais professionnel (calls clients ponctuels en EN)
+
+Merci de candidater avec votre TJM et 2-3 projets similaires.
+
+Cordialement,
+Sophie M.`;
 
 export default function App() {
   useWebSocket();
@@ -39,37 +79,24 @@ export default function App() {
   );
 
   async function runDemo() {
-    const presets = [
-      {
-        name: "Reviewer",
-        template: "code-reviewer",
-        mission:
-          "Review this: const top = users.filter(u => u.age > 18).map(u => u.name)[0]",
-      },
-      {
-        name: "Doc Bot",
-        template: "doc-writer",
-        mission:
-          "Document: function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); } }",
-      },
-      {
-        name: "Helper",
-        template: "general",
-        mission: "Explain the JavaScript event loop in three sentences.",
-      },
+    const triageAgents = [
+      { name: "Mission Analyzer", template: "mission-analyzer" as const },
+      { name: "Response Drafter", template: "response-drafter" as const },
+      { name: "Effort Estimator", template: "effort-estimator" as const },
     ];
-    for (const p of presets) {
+
+    for (const config of triageAgents) {
       const res = await fetch(`${API}/agents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: p.name, template: p.template }),
+        body: JSON.stringify(config),
       });
       const agent = await res.json();
-      // Fire and forget so all three stream in parallel
+      // Fire and forget so all three stream in parallel on the same offer
       fetch(`${API}/agents/${agent.id}/mission`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mission: p.mission }),
+        body: JSON.stringify({ mission: DEMO_MALT_OFFER }),
       });
     }
   }

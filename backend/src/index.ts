@@ -32,9 +32,20 @@ app.use((_req, res, next) => {
 app.options("*", (_req, res) => res.sendStatus(204));
 
 app.get("/agents", async (_req, res) => res.json(await listAgents()));
-app.post("/agents", async (req, res) =>
-  res.json(await createAgent(req.body.name, req.body.template ?? "general")),
-);
+const VALID_TEMPLATES = [
+  "mission-analyzer",
+  "response-drafter",
+  "effort-estimator",
+];
+app.post("/agents", async (req, res) => {
+  if (!VALID_TEMPLATES.includes(req.body.template)) {
+    return res.status(400).json({
+      error:
+        "template is required, one of: mission-analyzer, response-drafter, effort-estimator",
+    });
+  }
+  res.json(await createAgent(req.body.name, req.body.template));
+});
 app.post("/agents/:id/mission", missionLimiter, async (req, res) => {
   if ((await getDailyTotal()) > dailyCap()) {
     return res.status(429).json({

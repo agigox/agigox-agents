@@ -2,7 +2,10 @@ import { create } from "zustand";
 
 export type AgentStatus = "idle" | "running" | "done" | "error";
 
-export type AgentTemplate = "general" | "code-reviewer" | "doc-writer";
+export type AgentTemplate =
+  | "mission-analyzer"
+  | "response-drafter"
+  | "effort-estimator";
 
 export interface Agent {
   id: string;
