@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+backend/dist/
+dashboard/dist/
+
+# Env / secrets
+.env
+.env.local
+*.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Vite / tooling cache
+.vite/
+*.tsbuildinfo
+
+# OS
+.DS_Store
