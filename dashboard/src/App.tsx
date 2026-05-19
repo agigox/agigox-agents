@@ -16,6 +16,17 @@ export default function App() {
 
   const running = agents.filter((a) => a.status === "running").length;
 
+  const totalTokens = agents.reduce(
+    (sum, a) =>
+      sum + (a.usage ? a.usage.inputTokens + a.usage.outputTokens : 0),
+    0,
+  );
+  const totalCost = agents.reduce(
+    (sum, a) => sum + (a.usage ? a.usage.cost : 0),
+    0,
+  );
+  const tokenFmt = new Intl.NumberFormat(undefined, { notation: "compact" });
+
   async function handleDelete(agentId: string) {
     if (!confirm("Delete this agent?")) return;
     await fetch(`${API}/agents/${agentId}`, { method: "DELETE" });
@@ -59,7 +70,8 @@ export default function App() {
               padding: "2px 8px",
             }}
           >
-            {agents.length} total · {running} running
+            {agents.length} total · {running} running ·{" "}
+            {tokenFmt.format(totalTokens)} tokens · ${totalCost.toFixed(2)}
           </span>
         </div>
 

@@ -12,6 +12,7 @@ export interface Agent {
   currentMission: string | null;
   output: string;
   updatedAt: string;
+  usage?: { inputTokens: number; outputTokens: number; cost: number };
 }
 
 interface AgentStore {

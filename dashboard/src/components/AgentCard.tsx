@@ -17,6 +17,8 @@ const STATUS_LABEL: Record<string, string> = {
   error: "Error",
 };
 
+const compact = new Intl.NumberFormat(undefined, { notation: "compact" });
+
 interface Props {
   agent: Agent;
   onAssignMission: (agent: Agent) => void;
@@ -155,6 +157,15 @@ export function AgentCard({ agent, onAssignMission, onDelete }: Props) {
           <span style={{ color: "#444" }}>Waiting for mission…</span>
         )}
       </pre>
+
+      {/* Usage */}
+      {agent.usage && (
+        <div style={{ fontSize: 11, color: "var(--text-3)" }}>
+          {compact.format(agent.usage.inputTokens)} in ·{" "}
+          {compact.format(agent.usage.outputTokens)} out · $
+          {agent.usage.cost.toFixed(4)}
+        </div>
+      )}
 
       {/* Actions */}
       <div style={{ display: "flex", gap: 8 }}>

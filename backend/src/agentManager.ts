@@ -6,6 +6,10 @@ import { broadcast } from "./broadcast";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// claude-sonnet-4-5 standard pricing, USD per million tokens.
+// Re-verify on the Anthropic pricing page if the model changes.
+const PRICING = { inputPerMTok: 3, outputPerMTok: 15 };
+
 const TEMPLATE_PROMPTS: Record<AgentTemplate, (name: string) => string> = {
   general: (n) => `You are agent "${n}". Complete missions precisely and thoroughly.`,
   "code-reviewer": (n) =>
@@ -84,14 +88,29 @@ async function runAgent(agent: AgentState): Promise<void> {
     }
   }
 
+  const finalMsg = await stream.finalMessage();
+  const inputTokens = finalMsg.usage.input_tokens;
+  const outputTokens = finalMsg.usage.output_tokens;
+  const cost =
+    (inputTokens * PRICING.inputPerMTok +
+      outputTokens * PRICING.outputPerMTok) /
+    1_000_000;
+  const usage = { inputTokens, outputTokens, cost };
+
   const updated = await getAgent(agent.id);
   if (!updated) return;
   updated.status = "done";
   updated.output = fullOutput;
+  updated.usage = usage;
   updated.history.push({ role: "assistant", content: fullOutput });
   updated.updatedAt = new Date().toISOString();
   await saveAgent(updated);
-  broadcast({ type: "agent:done", agentId: agent.id, output: fullOutput });
+  broadcast({
+    type: "agent:done",
+    agentId: agent.id,
+    output: fullOutput,
+    usage,
+  });
 }
 
 export async function listAgents() {

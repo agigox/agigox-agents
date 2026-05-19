@@ -14,6 +14,7 @@ export interface AgentState {
   createdAt: string;
   updatedAt: string;
   history: Anthropic.MessageParam[];
+  usage?: { inputTokens: number; outputTokens: number; cost: number };
 }
 
 export type WSMessage =
@@ -22,5 +23,10 @@ export type WSMessage =
   | { type: "agent:updated"; agent: AgentState }
   | { type: "agent:deleted"; agentId: string }
   | { type: "agent:token"; agentId: string; token: string }
-  | { type: "agent:done"; agentId: string; output: string }
+  | {
+      type: "agent:done";
+      agentId: string;
+      output: string;
+      usage?: { inputTokens: number; outputTokens: number; cost: number };
+    }
   | { type: "agent:error"; agentId: string; error: string };

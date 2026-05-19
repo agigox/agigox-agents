@@ -32,6 +32,7 @@ export function useWebSocket() {
               ...store.agents[msg.agentId],
               status: "done",
               output: msg.output,
+              usage: msg.usage,
             });
             break;
           case "agent:error":
