@@ -3,12 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 import { AgentState, AgentTemplate } from "./types";
 import { saveAgent, getAgent, getAllAgents, deleteAgent } from "./redisClient";
 import { broadcast } from "./broadcast";
+import { addDailyUsage } from "./usageGuard";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // claude-sonnet-4-5 standard pricing, USD per million tokens.
 // Re-verify on the Anthropic pricing page if the model changes.
 const PRICING = { inputPerMTok: 3, outputPerMTok: 15 };
+
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5";
 
 const TEMPLATE_PROMPTS: Record<AgentTemplate, (name: string) => string> = {
   general: (n) => `You are agent "${n}". Complete missions precisely and thoroughly.`,
@@ -71,7 +74,7 @@ async function runAgent(agent: AgentState): Promise<void> {
   let fullOutput = "";
 
   const stream = await anthropic.messages.stream({
-    model: "claude-sonnet-4-5",
+    model: MODEL,
     max_tokens: 4096,
     system: TEMPLATE_PROMPTS[agent.template](agent.name),
     messages: agent.history,
@@ -96,6 +99,7 @@ async function runAgent(agent: AgentState): Promise<void> {
       outputTokens * PRICING.outputPerMTok) /
     1_000_000;
   const usage = { inputTokens, outputTokens, cost };
+  await addDailyUsage(inputTokens + outputTokens);
 
   const updated = await getAgent(agent.id);
   if (!updated) return;

@@ -164,9 +164,6 @@ export default function App() {
               marginTop: 100,
             }}
           >
-            <div style={{ fontSize: 32, marginBottom: 10, letterSpacing: -2 }}>
-              — —
-            </div>
             <div style={{ fontSize: 14 }}>No agents yet.</div>
             <div style={{ fontSize: 12, marginTop: 4 }}>
               Create one above or send /create from Telegram.
