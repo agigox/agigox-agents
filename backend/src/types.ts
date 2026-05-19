@@ -2,10 +2,13 @@ import Anthropic from "@anthropic-ai/sdk";
 
 export type AgentStatus = "idle" | "running" | "done" | "error";
 
+export type AgentTemplate = "general" | "code-reviewer" | "doc-writer";
+
 export interface AgentState {
   id: string;
   name: string;
   status: AgentStatus;
+  template: AgentTemplate;
   currentMission: string | null;
   output: string;
   createdAt: string;

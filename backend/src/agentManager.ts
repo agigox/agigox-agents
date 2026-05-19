@@ -1,16 +1,28 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { v4 as uuidv4 } from "uuid";
-import { AgentState } from "./types";
+import { AgentState, AgentTemplate } from "./types";
 import { saveAgent, getAgent, getAllAgents, deleteAgent } from "./redisClient";
 import { broadcast } from "./broadcast";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-export async function createAgent(name: string): Promise<AgentState> {
+const TEMPLATE_PROMPTS: Record<AgentTemplate, (name: string) => string> = {
+  general: (n) => `You are agent "${n}". Complete missions precisely and thoroughly.`,
+  "code-reviewer": (n) =>
+    `You are "${n}", a senior code reviewer. For any code submitted, return: 1) Summary, 2) Issues (severity, line, fix), 3) Suggestions. Be terse, no preamble.`,
+  "doc-writer": (n) =>
+    `You are "${n}", a technical writer. Generate JSDoc-style docs for the code: description, @param, @returns, one short example.`,
+};
+
+export async function createAgent(
+  name: string,
+  template: AgentTemplate = "general",
+): Promise<AgentState> {
   const agent: AgentState = {
     id: uuidv4(),
     name,
     status: "idle",
+    template,
     currentMission: null,
     output: "",
     history: [],
@@ -57,7 +69,7 @@ async function runAgent(agent: AgentState): Promise<void> {
   const stream = await anthropic.messages.stream({
     model: "claude-sonnet-4-5",
     max_tokens: 4096,
-    system: `You are agent "${agent.name}". Complete missions precisely and thoroughly.`,
+    system: TEMPLATE_PROMPTS[agent.template](agent.name),
     messages: agent.history,
   });
 

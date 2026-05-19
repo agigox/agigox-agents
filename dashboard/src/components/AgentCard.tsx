@@ -75,6 +75,15 @@ export function AgentCard({ agent, onAssignMission, onDelete }: Props) {
           >
             {agent.id.slice(0, 12)}…
           </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: "var(--text-3)",
+              marginTop: 2,
+            }}
+          >
+            {agent.template.replace("-", " ")}
+          </div>
         </div>
         <div
           style={{

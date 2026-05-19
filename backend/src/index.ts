@@ -26,7 +26,7 @@ app.options("*", (_req, res) => res.sendStatus(204));
 
 app.get("/agents", async (_req, res) => res.json(await listAgents()));
 app.post("/agents", async (req, res) =>
-  res.json(await createAgent(req.body.name)),
+  res.json(await createAgent(req.body.name, req.body.template ?? "general")),
 );
 app.post("/agents/:id/mission", async (req, res) => {
   await assignMission(req.params.id, req.body.mission);

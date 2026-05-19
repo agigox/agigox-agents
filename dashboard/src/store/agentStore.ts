@@ -2,10 +2,13 @@ import { create } from "zustand";
 
 export type AgentStatus = "idle" | "running" | "done" | "error";
 
+export type AgentTemplate = "general" | "code-reviewer" | "doc-writer";
+
 export interface Agent {
   id: string;
   name: string;
   status: AgentStatus;
+  template: AgentTemplate;
   currentMission: string | null;
   output: string;
   updatedAt: string;

@@ -5,6 +5,13 @@ import {
   listAgents,
   removeAgent,
 } from "./agentManager";
+import { AgentTemplate } from "./types";
+
+const TEMPLATES: AgentTemplate[] = ["general", "code-reviewer", "doc-writer"];
+
+function isTemplate(value: string): value is AgentTemplate {
+  return (TEMPLATES as string[]).includes(value);
+}
 
 export function initTelegramBot(): void {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -17,14 +24,22 @@ export function initTelegramBot(): void {
 
   bot.command("start", (ctx) =>
     ctx.reply(
-      "Agent Dashboard\n\n/create <name>\n/mission <id> <task>\n/list\n/delete <id>",
+      "Agent Dashboard\n\n/create <name> [template]\n/mission <id> <task>\n/list\n/delete <id>\n\ntemplates: general, code-reviewer, doc-writer",
     ),
   );
   bot.command("create", async (ctx) => {
-    const name = ctx.match.trim();
-    if (!name) return ctx.reply("Usage: /create <name>");
-    const agent = await createAgent(name);
-    ctx.reply(`Created\nID: ${agent.id}\nName: ${agent.name}`);
+    const tokens = ctx.match.trim().split(/\s+/).filter(Boolean);
+    if (!tokens.length) return ctx.reply("Usage: /create <name> [template]");
+    const last = tokens[tokens.length - 1];
+    const template: AgentTemplate = isTemplate(last) ? last : "general";
+    const name = isTemplate(last)
+      ? tokens.slice(0, -1).join(" ")
+      : tokens.join(" ");
+    if (!name) return ctx.reply("Usage: /create <name> [template]");
+    const agent = await createAgent(name, template);
+    ctx.reply(
+      `Created\nID: ${agent.id}\nName: ${agent.name}\nTemplate: ${agent.template}`,
+    );
   });
   bot.command("mission", async (ctx) => {
     const [agentId, ...rest] = ctx.match.trim().split(" ");

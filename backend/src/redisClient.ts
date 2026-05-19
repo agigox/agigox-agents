@@ -15,7 +15,11 @@ export async function saveAgent(agent: AgentState): Promise<void> {
 
 export async function getAgent(id: string): Promise<AgentState | null> {
   const raw = await redis.get(KEY(id));
-  return raw ? JSON.parse(raw) : null;
+  if (!raw) return null;
+  const agent = JSON.parse(raw) as AgentState;
+  // Back-compat: agents persisted before templates existed have no template.
+  if (!agent.template) agent.template = "general";
+  return agent;
 }
 
 export async function getAllAgents(): Promise<AgentState[]> {
